@@ -5,26 +5,25 @@ import PreviewPanel from './components/PreviewPanel'
 function App() {
   const [resumeData, setResumeData] = useState({
     personalInfo: {
-      name: 'Taylor Robbins',
+      name: 'Steven Marino',
       position: '',
-      address: 'Cedar Park, TX, 78613',
-      account: 'taylor.sct.robbins6@gmail.com',
-      phone: '+1(512)898-9135',
+      address: 'Manchaca, TX, 78652',
+      account: 'marino.steven.michael@gmail.com',
+      phone: '+1 (516) 253-4961',
     },
     summary: '',
     experiences: [
-      { company: 'Coinbase', title: '', start: 'Jul 2024', end: 'Dec 2025', bullets: [''] },
-      { company: 'Daydream', title: '', start: 'Jun 2023', end: 'Jun 2024', bullets: [''] },
-      { company: 'Google', title: '', start: 'Jan 2019', end: 'May 2023', bullets: [''] },
-      { company: 'Dockyard', title: '', start: 'Jun 2015', end: 'Dec 2018', bullets: [''] },
+      { company: 'BFC Software', title: '', start: 'Dec 2023', end: 'Feb 2026', bullets: [''] },
+      { company: 'BetterWorld Technology', title: '', start: 'Apr 2020', end: 'Oct 2023', bullets: [''] },
+      { company: 'Contigo Technology', title: '', start: 'May 2016', end: 'Mar 2020', bullets: [''] },
+      { company: 'Syberry Corporation', title: '', start: 'Feb 2014', end: 'Apr 2016', bullets: [''] },
     ],
     technicalSkills: '',
     education: [
       {
-        university: 'Texas State University',
+        university: 'The University of Texas at Austin',
         major: 'Bachelor of Science in Computer Science',
-        startYear: '2010',
-        graduateYear: '2015',
+        graduateYear: '2013',
       },
     ],
     certifications: [],
