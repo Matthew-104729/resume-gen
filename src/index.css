@@ -49,3 +49,21 @@ body {
   }
 }
 
+/* Resume document specific typography */
+.resume-document {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  color: #111827;
+}
+
+.resume-document h1,
+.resume-document h2,
+.resume-document h3 {
+  letter-spacing: normal;
+}
+
+.resume-document p,
+.resume-document li {
+  line-height: 1.5;
+}
+

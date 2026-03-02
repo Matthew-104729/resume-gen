@@ -1,36 +1,30 @@
 // Helper function to format text with **bold** markers (for summary, experience, etc.)
 function formatBoldText(text) {
   if (!text) return ''
-  
-  // Match **text** patterns (non-greedy to handle multiple matches)
+
   const parts = []
   let lastIndex = 0
   const regex = /\*\*(.*?)\*\*/g
   let match
-  
+
   while ((match = regex.exec(text)) !== null) {
-    // Add text before the match
     if (match.index > lastIndex) {
       parts.push({ type: 'text', content: text.substring(lastIndex, match.index), key: `text-${lastIndex}` })
     }
-    // Add the bold text (without **)
     parts.push({ type: 'bold', content: match[1], key: `bold-${match.index}` })
     lastIndex = regex.lastIndex
   }
-  
-  // Add remaining text after last match
+
   if (lastIndex < text.length) {
     parts.push({ type: 'text', content: text.substring(lastIndex), key: `text-${lastIndex}` })
   }
-  
-  // If no matches found, return original text
+
   if (parts.length === 0) {
     return text
   }
-  
-  // Convert to React elements
-  return parts.map(part => 
-    part.type === 'bold' 
+
+  return parts.map(part =>
+    part.type === 'bold'
       ? <strong key={part.key}>{part.content}</strong>
       : part.content
   )
@@ -39,21 +33,17 @@ function formatBoldText(text) {
 // Helper function to format technical skills: remove all **, bold until ":"
 function formatTechnicalSkills(text) {
   if (!text) return ''
-  
-  // Remove all ** markers first
-  let cleanedText = text.replace(/\*\*/g, '')
-  
-  // Split by newlines to handle multiple lines
+
+  const cleanedText = text.replace(/\*\*/g, '')
   const lines = cleanedText.split('\n')
-  
+
   return lines.map((line, lineIndex) => {
     if (!line.trim()) {
       return lineIndex < lines.length - 1 ? <br key={lineIndex} /> : null
     }
-    
+
     const colonIndex = line.indexOf(':')
     if (colonIndex !== -1) {
-      // Bold part before colon, normal after
       const beforeColon = line.substring(0, colonIndex)
       const afterColon = line.substring(colonIndex)
       return (
@@ -62,193 +52,199 @@ function formatTechnicalSkills(text) {
           {lineIndex < lines.length - 1 && <br />}
         </span>
       )
-    } else {
-      // No colon found, return as is
-      return (
-        <span key={lineIndex}>
-          {line}
-          {lineIndex < lines.length - 1 && <br />}
-        </span>
-      )
     }
+
+    return (
+      <span key={lineIndex}>
+        {line}
+        {lineIndex < lines.length - 1 && <br />}
+      </span>
+    )
   })
 }
 
-function ResumeDocument({ resumeData }) {
+function SectionTitle({ children }) {
   return (
-    <div className="bg-white p-10 max-w-4xl mx-auto" style={{ minHeight: '11in' }}>
-      {/* Personal Info Section */}
-      <div className="mb-2 text-center pb-6">
-        <h1 className="text-5xl text-black tracking-tight" style={{ letterSpacing: '0.5px', fontFamily: 'Roboto Serif ExtraBold',fontWeight:1000}}>
-          {resumeData.personalInfo.name}
-        </h1>
-        <p className="text-2xl font-semibold text-black mb-4" style={{ letterSpacing: '0.3px', fontFamily:'Roboto Serif Medium' }}>
-          {resumeData.personalInfo.position}
-        </p>
-        <div className="flex flex-wrap justify-center gap-3 text-sm text-black" style = {{fontSize:15, fontFamily: 'Roboto Serif Medium', fontWeight:500}}>
-          <span className="flex items-center gap-1">
-            <span className="text-black"></span>
-            {resumeData.personalInfo.address}
-          </span>
-          <span className="text-black">|</span>
-          <span className="flex items-center gap-1">
-            <span className="text-black"></span>
-            {resumeData.personalInfo.account}
-          </span>
-          <span className="text-black">|</span>
-          <span className="flex items-center gap-1">
-            <span className="text-black"></span>
-            {resumeData.personalInfo.phone}
-          </span>
-        </div>
-      </div>
+    <h2 className="text-[10px] font-semibold tracking-[0.3em] text-slate-500 uppercase border-b border-slate-200 pb-1 mb-3">
+      {children}
+    </h2>
+  )
+}
 
-      {/* Summary Section */}
-      {resumeData.summary && (
-        <div className="mb-4">
-          <h2 className="font-bold mb-2  tracking-wider border-b-2 pb-2" style={{fontSize:20, fontFamily:'Cambria', letterSpacing: '0.5px', borderColor: 'black'}}>
-            Summary
-          </h2>
-          <p className=" whitespace-pre-wrap" style={{ fontSize:14, fontFamily:'Cambria', letterSpacing: '0.5px', lineHeight:'1.2'}}>
-            {resumeData.summary.split('\n').map((line, lineIndex) => (
+function ResumeDocument({ resumeData }) {
+  const { personalInfo, summary, experiences, technicalSkills, education, certifications } = resumeData
+
+  return (
+    <div
+      className="resume-document bg-white px-10 py-8 max-w-3xl mx-auto text-slate-900"
+      style={{ minHeight: '11in' }}
+    >
+      {/* Header */}
+      <header className="pb-4 mb-6">
+        <div className="flex justify-between items-start gap-6">
+          <div className="flex-1">
+            {personalInfo.name && (
+              <h1 className="text-3xl font-semibold tracking-tight">
+                {personalInfo.name}
+              </h1>
+            )}
+            {personalInfo.position && (
+              <p className="mt-1 text-[13px] font-semibold text-slate-700 tracking-wide">
+                {personalInfo.position}
+              </p>
+            )}
+          </div>
+          <div className="flex flex-col items-end text-[11px] text-slate-600 leading-relaxed">
+            {personalInfo.address && <span>{personalInfo.address}</span>}
+            {personalInfo.account && <span>{personalInfo.account}</span>}
+            {personalInfo.phone && <span>{personalInfo.phone}</span>}
+          </div>
+        </div>
+      </header>
+
+      {/* Summary */}
+      {summary && summary.trim() && (
+        <section className="mb-5">
+          <SectionTitle>Summary</SectionTitle>
+          <p className="text-[12px] leading-relaxed whitespace-pre-wrap">
+            {summary.split('\n').map((line, lineIndex, arr) => (
               <span key={lineIndex}>
                 {formatBoldText(line)}
-                {lineIndex < resumeData.summary.split('\n').length - 1 && <br />}
+                {lineIndex < arr.length - 1 && <br />}
               </span>
             ))}
           </p>
-        </div>
+        </section>
+      )}
+      
+      {/* Technical Skills */}
+      {technicalSkills && technicalSkills.trim() && (
+        <section className="mb-5">
+          <SectionTitle>Technical Skills</SectionTitle>
+          <p className="text-[12px] leading-relaxed flex flex-col gap-[6px]">
+            {formatTechnicalSkills(technicalSkills)}
+          </p>
+        </section>
       )}
 
-      {/* Experience Section */}
-      {resumeData.experiences.some(exp => exp.company || exp.title) && (
-        <div className="mb-4">
-          <h2 className="font-bold mb-2 tracking-wider border-b-2 pb-2" style={{ fontSize:20, fontFamily:'Cambria', letterSpacing: '0.5px', borderColor: 'black'}}>
-            Experience
-          </h2>
-          <div className="space-y-2">
-            {resumeData.experiences.map((exp, index) => {
+      {/* Experience */}
+      {experiences && experiences.some(exp => exp.company || exp.title) && (
+        <section className="mb-5">
+          <SectionTitle>Professional Experience</SectionTitle>
+          <div className="space-y-4">
+            {experiences.map((exp, index) => {
               if (!exp.company && !exp.title) return null
+              const hasBullets = Array.isArray(exp.bullets) && exp.bullets.some(b => b && b.trim())
+
               return (
-                <div key={index} className="pb-4 border-b  last:border-b-0">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex-1">
-                      {exp.company && (
-                        <p className=" font-bold " style={{ fontSize:16, fontFamily:'Cambria', letterSpacing: '0.5px'}}>
-                          {exp.company}
-                        </p>
-                      )}
+                <article key={index} className="border-b border-slate-100 pb-3 last:border-b-0 last:pb-0">
+                  <div className="flex justify-between gap-4">
+                    <div className="flex-1 min-w-0">
                       {exp.title && (
-                        <h3 className=" font-bold" style={{ fontSize:15, fontFamily:'Cambria', letterSpacing: '0.5px'}}>
+                        <h3 className="text-[13px] font-semibold text-slate-900 leading-snug">
                           {exp.title}
                         </h3>
                       )}
+                      {exp.company && (
+                        <p className="text-[12px] text-slate-700 mt-0.5">
+                          {exp.company}
+                        </p>
+                      )}
                     </div>
                     {(exp.start || exp.end) && (
-                      <p className="whitespace-nowrap ml-4 text-right" style={{ fontSize:14, fontFamily:'Cambria', letterSpacing: '0.5px'}}>
-                        {exp.start} {exp.start && exp.end ? ' - ' : ''} {exp.end}
+                      <p className="text-[11px] text-slate-600 whitespace-nowrap">
+                        {exp.start}
+                        {exp.start && exp.end ? ' – ' : ''}
+                        {exp.end}
                       </p>
                     )}
                   </div>
-                  {exp.bullets.some(b => b.trim()) && (
-                    <ul className="list-none mt-3 space-y-1.5 ml-1">
+
+                  {hasBullets && (
+                    <ul className="mt-2 list-disc list-outside pl-5 space-y-1.5">
                       {exp.bullets
-                        .filter(bullet => bullet.trim())
+                        .filter(bullet => bullet && bullet.trim()) 
                         .map((bullet, bulletIndex) => (
-                          <li key={bulletIndex} className="text-sm  leading-relaxed flex items-start" style={{ fontSize:14, fontFamily:'Cambria', letterSpacing: '0.5px', lineHeight:'1.2'}}>
-                            <span className=" font-bold mr-2">•</span>
-                            <span className="flex-1">{formatBoldText(bullet)}</span>
+                          <li
+                            key={bulletIndex}
+                            className="text-[12px] leading-relaxed text-slate-800"
+                          >
+                            {formatBoldText(bullet)}
                           </li>
                         ))}
                     </ul>
                   )}
-                </div>
+                </article>
               )
             })}
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Technical Skills Section */}
-      {resumeData.technicalSkills && (
-        <div className="mb-4">
-          <h2 className="font-bold mb-3 tracking-wider border-b-2 pb-2" style={{ fontSize:20, fontFamily:'Cambria', letterSpacing: '0.5px', borderColor: 'black'}}>
-            Technical Skills
-          </h2>
-          <p className="leading-relaxed" style={{ fontSize:14, fontFamily:'Cambria', letterSpacing: '0.5px', lineHeight:'1.5'}}>
-            {formatTechnicalSkills(resumeData.technicalSkills)}
-          </p>
-        </div>
-      )}
-
-      {/* Education Section */}
-      {resumeData.education.some(edu => edu.university || edu.major) && (
-        <div className="mb-4">
-          <h2 className="font-bold  mb-5 tracking-wider border-b-2  pb-2" style={{ fontSize:20, fontFamily:'Cambria', letterSpacing: '0.5px', borderColor: 'black'}}>
-            Education
-          </h2>
-          <div className="space-y-5">
-            {resumeData.education.map((edu, index) => {
+      {/* Education */}
+      {education && education.some(edu => edu.university || edu.major) && (
+        <section className="mb-5">
+          <SectionTitle>Education</SectionTitle>
+          <div className="space-y-3">
+            {education.map((edu, index) => {
               if (!edu.university && !edu.major) return null
+
               return (
-                <div key={index} className="mb-4 pb-4 border-b last:border-b-0">
-                  <div className="flex justify-between items-start mb-1">
-                    <div className="flex-1">
-                      {edu.university && (
-                        <h3 className="text-base font-bold  mb-1"  style={{ fontSize:14, fontFamily:'Cambria', letterSpacing: '0.5px', lineHeight:'1.2'}}>
-                          {edu.university}
-                        </h3>
-                      )}
-                      {edu.major && (
-                        <p style={{ fontSize:14, fontFamily:'Cambria', letterSpacing: '0.5px', lineHeight:'1.2'}}>
-                          {edu.major}
-                        </p>
-                      )}
-                    </div>
-                    {(edu.startYear || edu.graduateYear) && (
-                      <p className="whitespace-nowrap ml-4 text-right"  style={{ fontSize:14, fontFamily:'Cambria', letterSpacing: '0.5px', lineHeight:'1.2'}}>
-                        {edu.startYear} {edu.startYear && edu.graduateYear ? ' - ' : ''} {edu.graduateYear}
+                <article key={index} className="flex justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    {edu.university && (
+                      <h3 className="text-[13px] font-semibold text-slate-900 leading-snug">
+                        {edu.university}
+                      </h3>
+                    )}
+                    {edu.major && (
+                      <p className="text-[12px] text-slate-700 mt-0.5">
+                        {edu.major}
                       </p>
                     )}
                   </div>
-                </div>
+                  {(edu.startYear || edu.graduateYear) && (
+                    <p className="text-[11px] text-slate-600 whitespace-nowrap">
+                      {edu.startYear}
+                      {edu.startYear && edu.graduateYear ? ' – ' : ''}
+                      {edu.graduateYear}
+                    </p>
+                  )}
+                </article>
               )
             })}
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Licenses & Certifications Section */}
-      {resumeData.certifications && resumeData.certifications.length > 0 && resumeData.certifications.some(cert => cert.major) && (
-        <div className="mb-7">
-          <h2 className="text-lg font-bold  mb-5 uppercase tracking-wider border-b-2 pb-2" style={{ letterSpacing: '1px' }}>
-            Licenses & Certifications
-          </h2>
-          <div className="space-y-4">
-            {resumeData.certifications.map((cert, index) => {
-              if (!cert.major) return null
-              return (
-                <div key={index} className="mb-3 pb-3 border-b last:border-b-0">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      {cert.major && (
-                        <h3 className="text-base font-bold mb-1">
-                          {cert.major}
-                        </h3>
-                      )}
+      {/* Licenses & Certifications */}
+      {certifications &&
+        certifications.length > 0 &&
+        certifications.some(cert => cert.major) && (
+          <section className="mb-2">
+            <SectionTitle>Licenses & Certifications</SectionTitle>
+            <div className="space-y-2">
+              {certifications.map((cert, index) => {
+                if (!cert.major) return null
+
+                return (
+                  <article key={index} className="flex justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-[13px] font-semibold text-slate-900 leading-snug">
+                        {cert.major}
+                      </h3>
                     </div>
                     {cert.issueDate && (
-                      <p className="text-sm font-medium whitespace-nowrap ml-4 text-right">
+                      <p className="text-[11px] text-slate-600 whitespace-nowrap">
                         {cert.issueDate}
                       </p>
                     )}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
+                  </article>
+                )
+              })}
+            </div>
+          </section>
+        )}
     </div>
   )
 }
