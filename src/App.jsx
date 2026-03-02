@@ -9,7 +9,7 @@ function App() {
       position: '',
       address: 'Manchaca, TX, 78652',
       account: 'marino.steven.michael@gmail.com',
-      phone: '+1 (516) 253-4961',
+      phone: '+1 (323) 505-2377',
     },
     summary: '',
     experiences: [
